@@ -2,13 +2,12 @@
 {-# LANGUAGE FlexibleContexts     #-}
 
 -- | Module that renders the 3D triangles
-module ThreeD (render, renderableAcc, fromFile, orthographic, perspective, paintToCanvas) where
+module ThreeD (render, renderableAcc, fromFile, orthographic, perspective, paintToCanvas, ExpandThreeD) where
 
 import Data.Array.Accelerate
-import Data.Array.Accelerate.LLVM.PTX (run)
+import Data.Array.Accelerate.LLVM.PTX (run, run1)
 import qualified Prelude
 import Prelude (IO)
-import Expand as Lib
 import Triangles
 import LinAlg
 import ObjParser
@@ -54,17 +53,22 @@ light = T3 0 10 10
 -- Utility functions
 --------------------
 
+type ExpandThreeD = (Exp (LineT, (PixelRGB8, Float)) -> Exp Int)
+             -> (Exp (LineT, (PixelRGB8, Float)) -> Exp Int -> Exp (PointT, (PixelRGB8, Float)))
+             -> Acc (Vector (LineT, (PixelRGB8, Float)))
+             -> Acc (Vector (PointT, (PixelRGB8, Float)))
+
 -- | Given a list of 2D lines (with their colour and z-index), returns a list of points that make up that 2D line (with their colour and z-index)
-pointsOfLines :: Acc (Vector (LineT, (PixelRGB8, Float))) -> Acc (Vector (PointT, (PixelRGB8, Float)))
-pointsOfLines = Lib.expand (\(T2 l _) -> pointsInLine l) (\(T2 l (T2 c z)) i -> T2 (getPointInLine l i) (T2 c z) )
+pointsOfLines :: ExpandThreeD -> Acc (Vector (LineT, (PixelRGB8, Float))) -> Acc (Vector (PointT, (PixelRGB8, Float)))
+pointsOfLines expand = expand (\(T2 l _) -> pointsInLine l) (\(T2 l (T2 c z)) i -> T2 (getPointInLine l i) (T2 c z) )
 
 -- | Given a list of 2D triangles (with their colour and z-index), returns a list of lines that make up that 2D triangle (with their colour and z-index)
 linesOfTriangles :: Acc (Vector (TriangleT, (PixelRGB8, Float))) -> Acc (Vector (LineT, (PixelRGB8, Float)))
-linesOfTriangles = Lib.expand (\(T2 t _) -> linesInTriangle t) (\(T2 t (T2 c z)) i -> T2 (getLineInTriangle t i) (T2 c z)) . map (\(T2 t (T2 c z)) -> T2 (normalise t) (T2 c z))
+linesOfTriangles = expand' (\(T2 t _) -> linesInTriangle t) (\(T2 t (T2 c z)) i -> T2 (getLineInTriangle t i) (T2 c z)) . map (\(T2 t (T2 c z)) -> T2 (normalise t) (T2 c z))
 
 -- | Given a list of 2D triangles (with their colour and z-index), returns a list of points that make up that 2D triangle (with their colour and z-index)
-pointsOfTriangles :: Acc (Vector (TriangleT, (PixelRGB8, Float))) -> Acc (Vector (PointT, (PixelRGB8, Float)))
-pointsOfTriangles = ThreeD.pointsOfLines . ThreeD.linesOfTriangles
+pointsOfTriangles :: ExpandThreeD -> Acc (Vector (TriangleT, (PixelRGB8, Float))) -> Acc (Vector (PointT, (PixelRGB8, Float)))
+pointsOfTriangles e = ThreeD.pointsOfLines e . ThreeD.linesOfTriangles
 
 -- | Multiplies a color by a given float
 (***) :: Exp PixelRGB8 -> Exp Float -> Exp PixelRGB8
@@ -196,26 +200,26 @@ orthographic triangles = map (screenTriangle mat) triangles
         mat = matMul (matMul vp orth) cam
 
 -- | Renders the input triangles to a canvas, taking the z-index of the triangles into account
-paintToCanvas :: Acc (Vector (TriangleT, (PixelRGB8, Float))) -> Acc (Array DIM2 PixelRGB8)
-paintToCanvas accIn = 
+paintToCanvas :: ExpandThreeD -> Acc (Vector (TriangleT, (PixelRGB8, Float))) -> Acc (Array DIM2 PixelRGB8)
+paintToCanvas e accIn = 
   let maxY = round $ screenX :: Exp Int
       maxX = round $ screenY :: Exp Int
 
       def  = generate (I2 maxX maxY) (const $ T2 (PixelRGB8_ 0 0 0) (1000.0)) -- Vector (PixelRGB8, Float)
 
       -- Note: In an array, the first coordinate is row, and the second column. Thus x and y swap!
-      p (I1 i) = (\(T2 a b) -> 
+      p point = (\(T2 a b) -> 
           if (maxY - b) > 0 && (maxY - b) < maxY && a < maxX && a > 0
             then Just_ $ I2 (maxY - b) (a)
-            else Nothing_) (points !! i)
+            else Nothing_) point
       comb a@(T2 c1 z1) b@(T2 c2 z2) = if z1 < z2 then a else b
-      xs = map snd acc -- Acc (Vector (PixelRGB8, Float))
+      xs = map (\(T2 point colour) -> T2 (p point) colour) acc -- Acc (Vector (PixelRGB8, Float))
   in
-      map fst $ permute comb def p xs
+      map fst $ permute' comb def xs
 
-  where acc = ThreeD.pointsOfTriangles accIn -- Acc (Vector (PointT, (PixelRGB8, Float)))
+  where acc = ThreeD.pointsOfTriangles e accIn -- Acc (Vector (PointT, (PixelRGB8, Float)))
         points = map fst acc -- Acc (Vector PointT)
 
 -- | Renders the input triangles to a canvas, and saves them to the file "test.png"
 render :: Acc (Vector (TriangleT, (PixelRGB8, Float))) -> IO ()
-render accIn = writePng "test.png" $ imageOfArray $ run $ paintToCanvas accIn
+render accIn = writePng "test.png" $ imageOfArray $ run $ paintToCanvas (expand Basic) accIn

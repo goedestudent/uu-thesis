@@ -17,7 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: lts-18.0
+resolver: lts-18.0 # nightly-2022-02-16
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -65,27 +65,31 @@ packages:
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
 extra-deps:
-# - '../accelerate'
-# - '../accelerate-llvm/accelerate-llvm'
-# - '../accelerate-llvm/accelerate-llvm-native'
-# - '../accelerate-llvm/accelerate-llvm-ptx'
-# - 'accelerate'
-# - 'accelerate-llvm/accelerate-llvm'
-# - 'accelerate-llvm/accelerate-llvm-native'
-# - 'accelerate-llvm/accelerate-llvm-ptx'
-- 'accelerate-1.3.0.0'
-- 'accelerate-llvm-1.3.0.0'
-- 'accelerate-llvm-native-1.3.0.0'
-- 'accelerate-llvm-ptx-1.3.0.0'
+# - github: goedestudent/accelerate
+#   commit: b56a2f2cd86f92e86bea1d492c346f3eab7a07f6
+# - github: goedestudent/accelerate-llvm
+#   commit: 81e7d6dd2fcc27ba4543e5363ddbe834c1ca3f11
+# - github: goedestudent/accelerate-llvm-ptx
+#   commit: 81e7d6dd2fcc27ba4543e5363ddbe834c1ca3f11
+- '../accelerate'
+- '../accelerate-llvm/accelerate-llvm'
+- '../accelerate-llvm/accelerate-llvm-ptx'
 - 'cuda-0.11.0.0'
 - 'nvvm-0.10.0.0'
-- 'llvm-hs-9.0.0'
-- 'llvm-hs-pure-9.0.0'
-- 'accelerate-io-JuicyPixels-0.1.0.0'
-- 'accelerate-io-vector-0.1.0.0'
 - 'JuicyPixels-3.3.3.1'
+- 'accelerate-io-JuicyPixels-0.1.0.0'
+- '../accelerate-io/accelerate-io-vector'
+- mwc-random-accelerate-0.2.0.0
+
+
+
+- github: llvm-hs/llvm-hs
+  commit: eda85a2bbe362a0b89df5adce0cb65e4e755eac5
+  subdirs:
+    - llvm-hs
+    - llvm-hs-pure
 flags:
   llvm-hs:
     shared-llvm: true
-  accelerate:
-    debug: true
+  # accelerate:
+  #   debug: true

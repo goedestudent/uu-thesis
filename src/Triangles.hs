@@ -47,7 +47,7 @@ getPointInLine (T2 p1 p2) idx =
 
 -- | Returns all points that make up the lines in the given 'Vector' of lines
 pointsOfLines :: Acc (Vector LineT) -> Acc (Vector PointT)
-pointsOfLines = Data.Array.Accelerate.expand pointsInLine getPointInLine
+pointsOfLines = Data.Array.Accelerate.expand Basic pointsInLine getPointInLine
 
 -- |Returns how many lines are in the given triangle
 linesInTriangle :: Triangle -> Exp Int
@@ -97,7 +97,7 @@ normalise (T3 p'' q''' r') =
 
 -- | Returns all lines that make up a given 'Vector' of triangles
 linesOfTriangles :: Acc (Vector TriangleT) -> Acc (Vector LineT)
-linesOfTriangles = (Data.Array.Accelerate.expand linesInTriangle getLineInTriangle) . map normalise
+linesOfTriangles = (Data.Array.Accelerate.expand Basic linesInTriangle getLineInTriangle) . map normalise
 
 -- | Returns all points that make up a given 'Vector' of triangles
 pointsOfTriangles :: Acc (Vector TriangleT) -> Acc (Vector PointT)

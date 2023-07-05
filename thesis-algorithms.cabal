@@ -1,0 +1,110 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.1.
+--
+-- see: https://github.com/sol/hpack
+
+name:           thesis-algorithms
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/goedestudent/uu-thesis#readme>
+homepage:       https://github.com/goedestudent/uu-thesis#readme
+bug-reports:    https://github.com/goedestudent/uu-thesis/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2023 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/goedestudent/uu-thesis
+
+library
+  exposed-modules:
+      Bench.Micro
+      BFS
+      BfsInputs
+      LinAlg
+      ObjParser
+      Prime
+      ThreeD
+      Triangles
+      Types
+      Utils
+  other-modules:
+      Paths_thesis_algorithms
+  hs-source-dirs:
+      src
+  ghc-options: -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -debug
+  build-depends:
+      JuicyPixels
+    , accelerate
+    , accelerate-io-JuicyPixels
+    , accelerate-llvm
+    , accelerate-llvm-ptx
+    , base >=4.7 && <5
+    , criterion
+    , mwc-random-accelerate
+    , random
+    , vector
+  default-language: Haskell2010
+
+executable thesis-exe
+  main-is: Main.hs
+  other-modules:
+      Micro
+      Spec
+      Paths_thesis_algorithms
+  hs-source-dirs:
+      app
+  ghc-options: -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -debug -threaded -rtsopts -with-rtsopts=-N -O2
+  build-depends:
+      accelerate
+    , accelerate-llvm
+    , accelerate-llvm-ptx
+    , base >=4.7 && <5
+    , containers
+    , criterion
+    , random
+    , thesis-algorithms
+    , time
+  default-language: Haskell2010
+
+test-suite bench-tests
+  type: exitcode-stdio-1.0
+  main-is: Test.hs
+  other-modules:
+      Paths_thesis_algorithms
+  hs-source-dirs:
+      tests
+  ghc-options: -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -debug -threaded -rtsopts -with-rtsopts=-N -Wall -O2 -fno-full-laziness
+  build-depends:
+      accelerate
+    , accelerate-llvm
+    , accelerate-llvm-ptx
+    , base >=4.7 && <5
+    , criterion
+    , random
+    , thesis-algorithms
+  default-language: Haskell2010
+
+benchmark thesis-bench
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_thesis_algorithms
+  hs-source-dirs:
+      bench
+  ghc-options: -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -debug -threaded -rtsopts -with-rtsopts=-N -Wall -O2 -fno-full-laziness
+  build-depends:
+      accelerate
+    , accelerate-llvm
+    , accelerate-llvm-ptx
+    , base >=4.7 && <5
+    , criterion
+    , random
+    , thesis-algorithms
+  default-language: Haskell2010

@@ -65,20 +65,21 @@ packages:
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
 extra-deps:
-# - github: goedestudent/accelerate
-#   commit: b56a2f2cd86f92e86bea1d492c346f3eab7a07f6
-# - github: goedestudent/accelerate-llvm
-#   commit: 81e7d6dd2fcc27ba4543e5363ddbe834c1ca3f11
-# - github: goedestudent/accelerate-llvm-ptx
-#   commit: 81e7d6dd2fcc27ba4543e5363ddbe834c1ca3f11
-- '../accelerate'
-- '../accelerate-llvm/accelerate-llvm'
-- '../accelerate-llvm/accelerate-llvm-ptx'
+- github: goedestudent/accelerate
+  commit: 695244f74e4ad08e6a78d351f8282d6d9c96999a
+- github: goedestudent/accelerate-llvm
+  commit: 80f0df0ca2326f2c9ac24ba691fe8515d23dec8b
+  subdirs:
+    - accelerate-llvm
+    - accelerate-llvm-ptx
+- github: goedestudent/accelerate-io
+  commit: 192b03608ab96e38c59e9f675eaac26d923586d1
+  subdirs:
+    - accelerate-io-vector
 - 'cuda-0.11.0.0'
 - 'nvvm-0.10.0.0'
 - 'JuicyPixels-3.3.3.1'
 - 'accelerate-io-JuicyPixels-0.1.0.0'
-- '../accelerate-io/accelerate-io-vector'
 - mwc-random-accelerate-0.2.0.0
 
 

@@ -21,7 +21,7 @@ import Data.Array.Accelerate hiding ((++))
 import Debug.Trace (trace)
 
 config' :: Config
-config' = defaultConfig {jsonFile = Just "benchmark.json", reportFile = Just "benchmark.html", timeLimit=0.01}
+config' = defaultConfig {jsonFile = Just "benchmark.json", reportFile = Just "benchmark.html", timeLimit=0.1}
 
 config :: String -> Config
 config name = defaultConfig {jsonFile = Just (benchname++".json"), reportFile = Just (benchname++".html"), timeLimit=5}
@@ -29,66 +29,76 @@ config name = defaultConfig {jsonFile = Just (benchname++".json"), reportFile = 
 
 main :: IO ()
 main = do
-          analyse "micro1" $ 
-            [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks1] | (strategyName, kernel) <- microBenchKernels ]
+      --     analyse "micro1" $ 
+      --       [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks1] | (strategyName, kernel) <- microBenchKernels ]
           
-          analyse "micro2" $ 
-            [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks2] | (strategyName, kernel) <- microBenchKernels ]
+      --     analyse "micro2" $ 
+      --       [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks2] | (strategyName, kernel) <- microBenchKernels ]
           
-          analyse "micro3" $ 
-            [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks3] | (strategyName, kernel) <- microBenchKernels ]
+      --     analyse "micro3" $ 
+      --       [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks3] | (strategyName, kernel) <- microBenchKernels ]
           
-          analyse "micro4" $ 
-            [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks4] | (strategyName, kernel) <- microBenchKernels ]
+      --     analyse "micro4" $ 
+      --       [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks4] | (strategyName, kernel) <- microBenchKernels ]
           
-          analyse "micro5" $ 
-            [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks5] | (strategyName, kernel) <- microBenchKernels ]
+      --     analyse "micro5" $ 
+      --       [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks5] | (strategyName, kernel) <- microBenchKernels ]
 
-          analyse "micro6" $ 
-            [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks6] | (strategyName, kernel) <- microBenchKernels ]
+      --     analyse "micro6" $ 
+      --       [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks6] | (strategyName, kernel) <- microBenchKernels ]
+
+          analyse "micro7" $ 
+            [ bgroup strategyName $ [bgroup benchName [ bench (show size) $ nf (runMicroBench kernel) benchInput | (size, benchInput) <- benchInputs] | (benchName, benchInputs) <- microBenchmarks7] | (strategyName, kernel) <- microBenchKernelsSklansky ]
           
       --     Only once, because the armadillo model takes very long in the No fusion kernel
-          analyse' 1 "3d" $ 
-            [ bgroup strategyName $ [benchmark realBenchmarksInputs strategy | benchmark <- realBenchmarks] | (strategyName, strategy) <- strategiesWithName2 ]
+      --     analyse' 1 "3d" $ 
+      --       [ bgroup strategyName $ [benchmark realBenchmarksInputs strategy | benchmark <- realBenchmarks] | (strategyName, strategy) <- strategiesWithName2 ]
           
-          analyse "primes" $ 
-            [ bgroup strategyName $ [benchmark realBenchmarks2Inputs strategy | benchmark <- realBenchmarks2] | (strategyName, strategy) <- strategiesWithName3 ]
-          analyse "primes-inefficient" $ 
-            [ bgroup strategyName $ [benchmark realBenchmarks2'Inputs strategy | benchmark <- realBenchmarks2'] | (strategyName, strategy) <- strategiesWithName3 ]
+      --     analyse "primes" $ 
+      --       [ bgroup strategyName $ [benchmark realBenchmarks2Inputs strategy | benchmark <- realBenchmarks2] | (strategyName, strategy) <- strategiesWithName3 ]
+      --     analyse "primes-inefficient" $ 
+      --       [ bgroup strategyName $ [benchmark realBenchmarks2'Inputs strategy | benchmark <- realBenchmarks2'] | (strategyName, strategy) <- strategiesWithName3 ]
       --     analyse "primes-balanced" $ 
       --       [ bgroup strategyName $ [benchmark realBenchmarks2''Inputs strategy | benchmark <- realBenchmarks2''] | (strategyName, strategy) <- strategiesWithName3 ]
           
-          analyse "bfs" $ 
-            [ bgroup strategyName $ [benchmark realBenchmarks3Inputs strategy | benchmark <- realBenchmarks3] | (strategyName, strategy) <- strategiesWithName4 ]
+      --     analyse "bfs" $ 
+      --       [ bgroup strategyName $ [benchmark realBenchmarks3Inputs strategy | benchmark <- realBenchmarks3] | (strategyName, strategy) <- strategiesWithName4 ]
   where 
         !microBenchmarks1 = [toIndexRand]
-        !microBenchmarks2 = [toIndexRandWithLikeliness, toIndexRandWithLikelinessSmaller]
+        !microBenchmarks2 = [toIndexRandWithLikeliness]--, toIndexRandWithLikelinessSmaller]
         !microBenchmarks3 = [toIndexRandWithLikeliness']
         !microBenchmarks4 = [smallSizes]
         !microBenchmarks5 = [bigSizes]
         !microBenchmarks6 = [filterSizes]
+        !microBenchmarks7 = [smallSizesN]
         
-        !microBenchKernels = [(name, trace ("Creating microbenchmark kernel" ++ name) $ runN $ genericKernel strategy) | (name, strategy) <- strategiesWithName]
+      --   !microBenchKernels = [(name, trace ("Creating microbenchmark kernel" ++ name) $ runN $ genericKernel strategy) | (name, strategy) <- strategiesWithName]
+      --   !microBenchKernelsBinSearch = [(name, trace ("Creating microbenchmark kernel" ++ name) $ runN $ genericKernel strategy) | (name, strategy) <- strategiesWithNameBinSearch]
+        !microBenchKernelsSklansky = [(name, trace ("Creating microbenchmark kernel" ++ name) $ runN $ genericKernel strategy) | (name, strategy) <- strategiesWithNameSklansky]
         !runMicroBench = \kernel -> (\(totalSizes, (input, defs, sizes, segments, elements)) -> kernel input defs sizes segments elements)
         
 
-        !realBenchmarks   = [benchThreeD]
-        !realBenchmarks2  = [benchPrimes]
-        !realBenchmarks2'  = [benchPrimesInefficient]
+      --   !realBenchmarks   = [benchThreeD]
+      --   !realBenchmarks2  = [benchPrimes]
+      --   !realBenchmarks2'  = [benchPrimesInefficient]
       --   !realBenchmarks2''  = [benchPrimesBalanced]
-        !realBenchmarks3  = [benchBFS]
+      --   !realBenchmarks3  = [benchBFS]
 
-        !realBenchmarksInputs = benchThreeDInputs
-        !realBenchmarks2Inputs = benchPrimesInputs
-        !realBenchmarks2'Inputs = Prelude.init $ Prelude.init $ benchPrimesInputs
-        !realBenchmarks2''Inputs = realBenchmarks2'Inputs
-        !realBenchmarks3Inputs = benchBFSInputs
+      --   !realBenchmarksInputs = benchThreeDInputs
+      --   !realBenchmarks2Inputs = benchPrimesInputs
+      --   !realBenchmarks2'Inputs = Prelude.init $ Prelude.init $ benchPrimesInputs
+      --   !realBenchmarks2''Inputs = realBenchmarks2'Inputs
+      --   !realBenchmarks3Inputs = benchBFSInputs
 
-        strategies  = [Basic, Blocks, Shuffle, MultiBlock 2, MultiBlock' 2, MultiBlock 16, MultiBlock' 16, MultiBlock 128, MultiBlock' 128, MultiBlock 256, MultiBlock' 256, MultiBlock 512, MultiBlock' 512]--[Basic, BlockShuffle]
-        !strategiesWithName   = ("No fusion", expand') : [(show strategy, expand strategy) | strategy <- strategies]
-        !strategiesWithName2  = ("No fusion", expand') : [(show strategy, expand strategy) | strategy <- strategies]
-        !strategiesWithName3  = ("No fusion", expand') : [(show strategy, expand strategy) | strategy <- strategies]
-        !strategiesWithName4  = ("No fusion", expand') : [(show strategy, expand strategy) | strategy <- strategies]
+        strategies  = [Basic, Blocks, Shuffle, MultiBlock 2, MultiBlock 16, MultiBlock 128, MultiBlock 256, MultiBlock 512]--[Basic, BlockShuffle]
+        strategiesBinSearch  = [Basic, Blocks, Shuffle, MultiBlock 2, MultiBlock' 2, MultiBlock 16, MultiBlock' 16, MultiBlock 128, MultiBlock' 128, MultiBlock 256, MultiBlock' 256, MultiBlock 512, MultiBlock' 512]--[Basic, BlockShuffle]
+        strategiesSklansky   = [Basic, Blocks, Shuffle, MultiBlock 2, MultiBlock 16, MultiBlock'' 16, MultiBlock 128, MultiBlock'' 128, MultiBlock 256, MultiBlock'' 256, MultiBlock 512, MultiBlock'' 512]--[Basic, BlockShuffle]
+      --   !strategiesWithName   = ("No fusion", expand') : [(show strategy, expand strategy) | strategy <- strategies]
+      --   !strategiesWithNameBinSearch   = ("No fusion", expand') : [(show strategy, expand strategy) | strategy <- strategiesBinSearch]
+        !strategiesWithNameSklansky   = ("No fusion", expand') : [(show strategy, expand strategy) | strategy <- strategiesSklansky]
+      --   !strategiesWithName2  = ("No fusion", expand') : [(show strategy, expand strategy) | strategy <- strategies]
+      --   !strategiesWithName3  = ("No fusion", expand') : [(show strategy, expand strategy) | strategy <- strategies]
+      --   !strategiesWithName4  = ("No fusion", expand') : [(show strategy, expand strategy) | strategy <- strategies]
 
 analyse = analyse' 10
 analyse' runs benchmarkName bgroup = 

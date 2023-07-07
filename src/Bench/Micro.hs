@@ -69,6 +69,11 @@ module Bench.Micro where
     smallSizes = ("expand to small, permute to rand with sz ", inputs)
         where inputs = [ (size, trace ("Generating input for size " P.++ show size ) $ genInputThatPermutesToRandomWithLikelyRange' size [(1, 0, 10)]) | size <- sizes ]
               sizes = inputSizes
+
+    smallSizesN :: (String, [(Int, ExpandInput)])
+    smallSizesN = ("expand to small, permute to N ", inputs)
+        where inputs = [ (size, trace ("Generating input for size " P.++ show size ) $ genInputThatPermutesToRandomOrNothingWithLikelyRange size [(1, 0, 10)] 0.99) | size <- sizes ]
+              sizes = inputSizes
     
     bigSizes :: (String, [(Int, ExpandInput)])
     bigSizes = ("expand to big, permute to rand with sz ", inputs)
